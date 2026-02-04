@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ذاكرة الجامعة | أرشيف الذكريات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #2563EB;
+            --secondary-blue: #3B82F6;
+            --light-blue: #60A5FA;
+            --primary-orange: #F59E0B;
+            --secondary-orange: #FBBF24;
+            --dark-bg: #0F172A;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --glass: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.15);
+            --cols: 4;
+            --transition-slow: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-medium: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-fast: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: linear-gradient(135deg, #0B1120 0%, #0F172A 50%, #1E293B 100%);
+            color: #ffffff;
+            font-family: 'Almarai', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        /* --- CUSTOM SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-track { background: #0a0f1f; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary-blue), var(--primary-orange));
+            border-radius: 6px;
+            border: 2px solid #0a0f1f;
+        }
+
+        /* --- LOADING SCREEN --- */
+        #loader-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity var(--transition-slow), visibility var(--transition-slow);
+        }
+
+        .loader-logo {
+            font-size: 4rem;
+            color: var(--primary-blue);
+            margin-bottom: 2rem;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .loader-bar-container {
+            width: 300px;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 3px;
+        }
+
+        .loader-bar-progress {
+            position: absolute;
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange));
+            animation: loader-slide 1.8s infinite ease-in-out;
+            border-radius: 3px;
+        }
+
+        @keyframes loader-slide {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* --- ANIMATED BACKGROUND --- */
+        #background-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden; pointer-events: none;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.05) 0%, transparent 60%),
+                var(--dark-bg);
+        }
+
+        .floating-element {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--light-blue), 0 0 20px var(--light-blue);
+            animation: float 20s linear infinite;
+        }
+
+        .floating-element:nth-child(3n) {
+            background: var(--secondary-orange);
+            box-shadow: 0 0 10px var(--secondary-orange), 0 0 20px var(--secondary-orange);
+            width: 6px;
+            height: 6px;
+        }
+
+        .floating-element:nth-child(5n) {
+            background: white;
+            box-shadow: 0 0 10px white, 0 0 20px white;
+            width: 3px;
+            height: 3px;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(110vh) translateX(0) rotate(0deg); }
+            100% { transform: translateY(-20vh) translateX(100px) rotate(360deg); }
+        }
+
+        /* --- HEADER --- */
+        header {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.2) 0%, transparent 50%);
+            z-index: -1;
+            animation: header-bg-pulse 8s infinite alternate;
+        }
+
+        @keyframes header-bg-pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        .accent-line {
+            position: fixed; top: 0; right: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue) 0%, var(--primary-orange) 100%);
+            z-index: 1000;
+            transform-origin: right;
+            animation: line-grow 1.5s ease-out;
+        }
+
+        @keyframes line-grow {
+            0% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
+        }
+
+        .title-container {
+            position: relative;
+            margin-bottom: 40px;
+            perspective: 1000px;
+        }
+
+        h1 {
+            font-family: 'Almarai', sans-serif;
+            font-size: clamp(3.5rem, 12vw, 7rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 10px;
+            background: linear-gradient(to left, var(--primary-blue), var(--primary-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 40px rgba(37, 99, 235, 0.3);
+            transform-style: preserve-3d;
+            animation: title-enter 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: -2px;
+        }
+
+        @keyframes title-enter {
+            0% { 
+                opacity: 0; 
+                transform: translateY(50px) rotateX(20deg); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) rotateX(0); 
+            }
+        }
+
+        .subtitle {
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+            font-size: 0.9rem; 
+            color: var(--secondary-orange); 
+            margin-bottom: 20px;
+            font-weight: 700;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 10px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            animation: fade-up 0.8s ease 0.3s both;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+            animation: fade-up 0.8s ease 0.5s both;
+        }
+
+        @keyframes fade-up {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- BUTTONS --- */
+        .btn-group { 
+            display: flex; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            margin-top: 40px;
+            animation: fade-up 0.8s ease 0.7s both;
+        }
+        
+        .btn {
+            padding: 18px 40px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(245, 158, 11, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: all var(--transition-fast);
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(100%);
+            transition: transform 0.6s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.4), rgba(245, 158, 11, 0.3));
+            border-color: var(--primary-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn:hover::before {
+            transform: translateX(-100%);
+        }
+
+        .btn-upload {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(96, 165, 250, 0.1));
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-upload:hover {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(96, 165, 250, 0.3));
+            border-color: var(--primary-orange);
+            box-shadow: 0 20px 50px rgba(245, 158, 11, 0.3);
+        }
+
+        /* --- COMPACT MUSIC PLAYER --- */
+        .music-player-container {
+            width: 90%;
+            max-width: 600px;
+            margin: 50px auto;
+            position: relative;
+            animation: fade-up 0.8s ease 0.9s both;
+        }
+
+        .music-player {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-fast);
+        }
+
+        .music-player::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));
+        }
+
+        .music-player:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 80px rgba(37, 99, 235, 0.3);
+        }
+
+        .player-album-art {
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+            animation: rotate-album 20s linear infinite paused;
+        }
+
+        .music-player:hover .player-album-art {
+            animation-play-state: running;
+        }
+
+        @keyframes rotate-album {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .player-album-art::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+            animation: shine 3s infinite linear;
+        }
+
+        .player-album-art .campus-logo {
+            font-family: 'Almarai';
+            font-weight: 900;
+            font-size: 1.8rem;
+            color: white;
+            z-index: 2;
+        }
+
+        .player-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .player-track-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .player-track-artist {
+            font-size: 0.85rem;
+            color: var(--secondary-orange);
+            opacity: 0.9;
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            flex-shrink: 0;
+        }
+
+        .player-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+            border-color: var(--primary-blue);
+        }
+
+        .player-btn.play-btn {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            color: white;
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5);
+        }
+
+        .player-btn.play-btn:hover {
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-blue));
+            transform: scale(1.15);
+            box-shadow: 0 12px 35px rgba(37, 99, 235, 0.7);
+        }
+
+        .player-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* RTL Progress Bar for Compact Player */
+        .player-progress-container {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .player-progress {
+            position: absolute;
+            top: 0;
+            right: 0; /* Start from right for RTL */
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));
+            transition: width 0.1s linear;
+        }
+
+        /* Expanded Player View */
+        .player-expanded {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 400px;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 30px 90px rgba(0,0,0,0.6);
+            z-index: 1001;
+            display: none;
+            transform: translateY(30px) scale(0.95);
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideUp {
+            to { transform: translateY(0) scale(1); }
+        }
+
+        .player-expanded.active {
+            display: block;
+        }
+
+        .player-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .player-header h3 {
+            font-family: 'Almarai';
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: var(--secondary-orange);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .close-player {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 1.8rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .close-player:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .expanded-album-art {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.5);
+            animation: rotate-album 20s linear infinite;
+        }
+
+        .expanded-album-art .campus-logo {
+            font-family: 'Almarai';
+            font-weight: 900;
+            font-size: 3rem;
+            color: white;
+            z-index: 2;
+        }
+
+        .expanded-album-art::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+            animation: shine 3s infinite linear;
+        }
+
+        .expanded-info {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .expanded-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary-blue), var(--primary-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .expanded-artist {
+            font-size: 1rem;
+            color: var(--secondary-orange);
+            opacity: 0.9;
+        }
+
+        /* RTL Progress Bar for Expanded Player */
+        .expanded-progress {
+            margin-bottom: 35px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            right: 0; /* Start from right for RTL */
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            left: -8px; /* Position on left side for RTL */
+            top: -6px;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--primary-blue);
+            transition: all 0.2s ease;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #aaa;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .expanded-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .expanded-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .expanded-btn.play-btn {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+            color: white;
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.6);
+        }
+
+        .expanded-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+            border-color: var(--primary-blue);
+        }
+
+        .expanded-btn.play-btn:hover {
+            background: linear-gradient(135deg, var(--primary-orange), var(--primary-blue));
+            transform: scale(1.15);
+            box-shadow: 0 20px 50px rgba(37, 99, 235, 0.8);
+        }
+
+        /* RTL Volume Control */
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .volume-slider {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .volume-level {
+            position: absolute;
+            top: 0;
+            right: 0; /* Start from right for RTL */
+            height: 100%;
+            width: 80%;
+            background: linear-gradient(90deg, var(--primary-blue), transparent);
+            border-radius: 3px;
+        }
+
+        .playlist-section {
+            max-height: 220px;
+            overflow-y: auto;
+            margin-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
+        }
+
+        .playlist-item {
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all var(--transition-fast);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateX(-5px);
+        }
+
+        .playlist-item.active {
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.2));
+            color: var(--light-blue);
+            border-right: 3px solid var(--primary-blue);
+        }
+
+        .playlist-index {
+            font-family: 'Poppins';
+            font-size: 0.85rem;
+            color: var(--secondary-orange);
+            min-width: 35px;
+            font-weight: 700;
+        }
+
+        /* --- CONTROL DOCK --- */
+        .control-dock {
+            position: sticky; 
+            top: 30px; 
+            z-index: 900;
+            justify-content: center; 
+            margin: 30px auto 50px;
+            display: none;
+            max-width: 600px;
+            padding: 0 30px;
+            animation: fade-up 0.8s ease both;
+        }
+
+        .control-dock.active { display: flex; }
+
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 18px 35px;
+            border-radius: 20px;
+            display: flex; 
+            align-items: center; 
+            gap: 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+        }
+
+        .grid-label {
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            color: var(--secondary-orange); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input[type=range] { 
+            -webkit-appearance: none; 
+            width: 140px; 
+            height: 6px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 3px; 
+            outline: none; 
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; 
+            width: 22px; 
+            height: 22px; 
+            border-radius: 50%;
+            background: var(--primary-blue); 
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.8);
+            border: 3px solid white;
+            transition: all var(--transition-fast);
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            background: var(--primary-orange);
+            transform: scale(1.2);
+        }
+
+        /* --- GALLERY GRID --- */
+        #gallery {
+            display: none;
+            grid-template-columns: repeat(var(--cols), 1fr);
+            gap: 25px;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto 120px;
+            opacity: 0;
+            transition: opacity var(--transition-medium);
+        }
+
+        #gallery.active { 
+            display: grid; 
+            opacity: 1;
+        }
+
+        .card {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all var(--transition-medium);
+            aspect-ratio: 1;
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card.revealed { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+        }
+        
+        .card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-color: var(--primary-blue);
+            box-shadow: 0 25px 60px rgba(37, 99, 235, 0.3);
+            z-index: 10;
+        }
+        
+        .card img, .card video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: block; 
+            transition: transform 0.8s ease;
+        }
+
+        .card:hover img, .card:hover video {
+            transform: scale(1.1);
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            height: 50%;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .card:hover::after {
+            opacity: 1;
+        }
+
+        /* Video specific styles */
+        .card.video-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card.video-card:hover::before {
+            opacity: 1;
+        }
+
+        .video-play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(37, 99, 235, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .card.video-card:hover .video-play-button {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .video-play-button i {
+            color: white;
+            font-size: 24px;
+            margin-left: 5px;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .video-overlay i {
+            font-size: 0.6rem;
+        }
+
+        .card video {
+            display: none;
+        }
+
+        .card.video-card:hover video {
+            display: block;
+        }
+
+        .card.video-card:hover img {
+            display: none;
+        }
+
+        /* --- TO TOP BUTTON --- */
+        .to-top {
+            position: fixed;
+            bottom: 120px;
+            left: 40px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.9), rgba(245, 158, 11, 0.8));
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(30px) scale(0.9);
+            transition: all var(--transition-medium);
+            z-index: 1000;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(37, 99, 235, 0.4);
+        }
+
+        .to-top::before {
+            content: '';
+            position: absolute;
+            top: 0; 
+            right: 0; 
+            width: 100%; 
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-orange), var(--primary-blue));
+        }
+
+        .to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .to-top:hover {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.9), rgba(37, 99, 235, 0.8));
+            transform: translateY(-8px) scale(1.08);
+            box-shadow: 0 20px 50px rgba(37, 99, 235, 0.6);
+        }
+
+        .to-top svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+            transition: 0.3s ease;
+        }
+
+        .to-top:hover svg {
+            transform: translateY(-3px);
+        }
+
+        .loader { 
+            text-align: center; 
+            color: var(--secondary-orange); 
+            font-size: 0.9rem; 
+            letter-spacing: 3px; 
+            padding: 50px 20px;
+            display: none;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        #sentinel.active {
+            display: block;
+        }
+
+        /* --- FOOTER CREDIT --- */
+        .credit-footer {
+            position: fixed;
+            bottom: 30px;
+            right: 0;
+            left: 0;
+            text-align: center;
+            z-index: 999;
+            pointer-events: auto;
+        }
+
+        .credit-link {
+            display: inline-block;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--secondary-orange);
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: all var(--transition-fast);
+            animation: flicker 3s infinite;
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .credit-link:hover {
+            background: rgba(37, 99, 235, 0.9);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.4);
+            border-color: var(--primary-blue);
+            animation: none;
+        }
+
+        .credit-link span {
+            color: var(--light-blue);
+            font-weight: 700;
+        }
+
+        .credit-link .heart {
+            color: #EF476F;
+            margin: 0 5px;
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { 
+                opacity: 1; 
+                box-shadow: 0 5px 20px rgba(245, 158, 11, 0.3);
+            }
+            50% { 
+                opacity: 0.7; 
+                box-shadow: 0 5px 30px rgba(245, 158, 11, 0.5),
+                          0 0 40px rgba(245, 158, 11, 0.2);
+            }
+            70% { 
+                opacity: 0.9; 
+                box-shadow: 0 5px 25px rgba(245, 158, 11, 0.4);
+            }
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1200px) {
+            :root { --cols: 3; }
+        }
+
+        @media (max-width: 900px) {
+            :root { --cols: 2; }
+            h1 { font-size: 5rem; }
+            .music-player-container {
+                width: 95%;
+            }
+            .player-expanded {
+                width: calc(100% - 60px);
+                left: 30px;
+                right: 30px;
+                bottom: 30px;
+            }
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn {
+                width: 100%;
+                max-width: 320px;
+            }
+            .to-top {
+                left: 30px;
+                bottom: 100px;
+                width: 60px;
+                height: 60px;
+            }
+            .credit-footer {
+                bottom: 20px;
+            }
+            .credit-link {
+                padding: 10px 20px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            :root { --cols: 1; }
+            h1 { font-size: 3.5rem; }
+            .subtitle { font-size: 0.8rem; }
+            .tagline { font-size: 1rem; }
+            .music-player { padding: 15px; gap: 15px; }
+            .player-btn { width: 44px; height: 44px; }
+            .player-btn svg { width: 20px; height: 20px; }
+            .player-album-art { width: 60px; height: 60px; }
+            .expanded-album-art {
+                width: 100px;
+                height: 100px;
+            }
+            .expanded-album-art .campus-logo {
+                font-size: 2.5rem;
+            }
+            .to-top {
+                left: 20px;
+                bottom: 90px;
+                width: 55px;
+                height: 55px;
+            }
+            .credit-footer {
+                bottom: 15px;
+            }
+            .credit-link {
+                padding: 8px 16px;
+                font-size: 0.75rem;
+            }
+            .video-play-button {
+                width: 50px;
+                height: 50px;
+            }
+            .video-play-button i {
+                font-size: 20px;
+            }
+        }
+
+        /* Arabic specific styles */
+        .arabic-text {
+            font-family: 'Almarai', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader-overlay">
+        <div class="loader-logo">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="arabic-text" style="font-family: 'Almarai'; font-size: 0.9rem; letter-spacing: 4px; color: var(--light-blue); font-weight: 700; margin-bottom: 20px;">جاري تحميل الذكريات</div>
+        <div class="loader-bar-container">
+            <div class="loader-bar-progress"></div>
+        </div>
+        <div style="margin-top: 30px; font-size: 0.75rem; color: rgba(255,255,255,0.5);" class="arabic-text">...جمع اللحظات الجميلة</div>
+    </div>
+
+    <div class="accent-line"></div>
+    <div id="background-layer"></div>
+
+    <header>
+        <div class="header-bg"></div>
+        <div class="subtitle arabic-text">أرشيف ذكريات الجامعة</div>
+        <h1 class="arabic-text">ذكريات<br>الجامعة</h1>
+        <div class="tagline arabic-text">أرشيف رقمي يوثق رحلتنا الجامعية، صداقاتنا، واللحظات التي لا تُنسى معًا.</div>
+        
+        <div class="btn-group">
+            <button class="btn arabic-text" onclick="revealGallery()">استعرض الذكريات</button>
+            <a href="https://drive.google.com/drive/folders/1N2sISygBDjrojGsaDZzaNzs-_h-fT5Lf?usp=sharing" target="_blank" class="btn btn-upload arabic-text">أضف ذكرياتك</a>
+        </div>
+
+        <!-- Compact Music Player -->
+        <div class="music-player-container">
+            <div class="music-player" onclick="toggleExpandedPlayer()">
+                <div class="player-album-art">
+                    <div class="campus-logo"><i class="fas fa-music"></i></div>
+                </div>
+                <div class="player-info">
+                    <div class="player-track-title arabic-text" id="miniTrackTitle">أغاني الجامعة</div>
+                    <div class="player-track-artist" id="miniTrackArtist">ذاكرة الجامعة</div>
+                </div>
+                <div class="player-controls">
+                    <!-- Fixed arrow directions for RTL - swapped previous and next -->
+                    <button class="player-btn" onclick="event.stopPropagation(); prevTrack()">
+                        <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                    </button>
+                    <button class="player-btn play-btn" onclick="event.stopPropagation(); togglePlay()" id="playBtn">
+                        <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg id="pauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    </button>
+                    <button class="player-btn" onclick="event.stopPropagation(); nextTrack()">
+                        <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                    </button>
+                </div>
+                <!-- RTL Progress Container -->
+                <div class="player-progress-container" onclick="handleCompactProgressClick(event)">
+                    <div class="player-progress" id="miniProgress"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Expanded Music Player -->
+    <div class="player-expanded" id="expandedPlayer">
+        <div class="player-header">
+            <h3 class="arabic-text">أغانينا</h3>
+            <button class="close-player" onclick="toggleExpandedPlayer()">×</button>
+        </div>
+        <div class="expanded-album-art">
+            <div class="campus-logo"><i class="fas fa-headphones"></i></div>
+        </div>
+        <div class="expanded-info">
+            <div class="expanded-title arabic-text" id="expandedTrackTitle">أغاني الجامعة</div>
+            <div class="expanded-artist" id="expandedTrackArtist">ذاكرة الجامعة</div>
+        </div>
+        <div class="expanded-progress">
+            <div class="progress-bar" id="expandedProgressBar" onclick="handleExpandedProgressClick(event)">
+                <div class="progress-fill" id="expandedProgressFill"></div>
+            </div>
+            <div class="time-display">
+                <span id="currentTime">0:00</span>
+                <span id="totalTime">0:00</span>
+            </div>
+        </div>
+        <div class="expanded-controls">
+            <!-- Fixed arrow directions for RTL - swapped previous and next -->
+            <button class="expanded-btn" onclick="prevTrack()">
+                <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+            <button class="expanded-btn play-btn" onclick="togglePlay()" id="expandedPlayBtn">
+                <svg id="expandedPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <svg id="expandedPauseIcon" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <button class="expanded-btn" onclick="nextTrack()">
+                <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+        </div>
+        <!-- RTL Volume Control -->
+        <div class="volume-control">
+            <svg width="20" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/></svg>
+            <div class="volume-slider" onclick="adjustVolume(event)" id="volumeSlider">
+                <div class="volume-level" id="volumeLevel"></div>
+            </div>
+        </div>
+        <div class="playlist-section" id="playlist">
+            <!-- Playlist will be generated here -->
+        </div>
+    </div>
+
+    <div class="control-dock">
+        <div class="glass-panel">
+            <span class="grid-label arabic-text">حجم الشبكة</span>
+            <input type="range" id="sizeSlider" min="1" max="5" value="4">
+        </div>
+    </div>
+
+    <div id="gallery"></div>
+    <div id="sentinel" class="loader arabic-text">جاري تحميل المزيد من الذكريات...</div>
+
+    <!-- Credit Footer -->
+    <div class="credit-footer">
+        <a href="https://guns.lol/loody" target="_blank" class="credit-link">
+            Made with <span class="heart">❤</span> by <span>Arch/Khaled-Diab</span>
+        </a>
+    </div>
+
+    <div class="to-top" id="topBtn" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <svg viewBox="0 0 24 24">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
+        </svg>
+    </div>
+
+    <audio id="audioPlayer" crossorigin="anonymous"></audio>
+
+    <script>
+        // 1. LOADER DISMISSAL
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader-overlay');
+            setTimeout(() => {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.visibility = 'hidden';
+                    // Create floating background elements after loader is hidden
+                    createFloatingElements();
+                }, 800);
+            }, 1500);
+        });
+
+        // 2. BACKGROUND ANIMATION - Floating elements
+        function createFloatingElements() {
+            const bgLayer = document.getElementById('background-layer');
+            const numElements = 40;
+            
+            for (let i = 0; i < numElements; i++) {
+                const el = document.createElement('div');
+                el.classList.add('floating-element');
+                el.style.left = `${Math.random() * 100}%`;
+                el.style.animationDelay = `${Math.random() * -20}s`;
+                el.style.animationDuration = `${Math.random() * 10 + 15}s`;
+                bgLayer.appendChild(el);
+            }
+        }
+
+        // 3. DRIVE API CONFIG
+        const API_KEY = 'AIzaSyDP87nGTTf7ISyNyA_SP0AGTutSVzIshwY';
+        const IMAGE_FOLDER_ID = '1oJ-G2vJWHOMvooqOqwm_kqbHVe_vD8At';
+        const AUDIO_FOLDER_ID = '177UHJO1-Brnb3fTnxCo53OdRW_lfJH1v';
+        
+        let imageToken = '';
+        let loading = false;
+        let audioLoading = false;
+        let audioFiles = [];
+        let currentAudioIndex = 0;
+        let isPlaying = false;
+        const audioPlayer = document.getElementById('audioPlayer');
+
+        // 4. GALLERY REVEAL LOGIC
+        function revealGallery() {
+            const gallery = document.getElementById('gallery');
+            const controlDock = document.querySelector('.control-dock');
+            const sentinel = document.getElementById('sentinel');
+            
+            gallery.classList.add('active');
+            controlDock.classList.add('active');
+            sentinel.classList.add('active');
+            
+            // Animate reveal
+            gallery.style.animation = 'fade-up 0.8s ease forwards';
+            
+            window.scrollTo({
+                top: controlDock.offsetTop - 30,
+                behavior: 'smooth'
+            });
+
+            if (!loading && imageToken !== null) fetchImages();
+            if (audioFiles.length === 0) fetchAudioFiles();
+        }
+
+        async function fetchImages() {
+            if (loading || imageToken === null) return;
+            loading = true;
+            // Fetch both images and videos
+            const q = encodeURIComponent(`'${IMAGE_FOLDER_ID}' in parents and (mimeType contains 'image/' or mimeType contains 'video/') and trashed = false`);
+            const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,thumbnailLink,mimeType,name)&pageSize=12&pageToken=${imageToken}&key=${API_KEY}`;
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.files) {
+                    const gallery = document.getElementById('gallery');
+                    data.files.forEach((file, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        
+                        const imgUrl = file.thumbnailLink.replace(/=s\d+/, '=s800');
+                        const isVideo = file.mimeType.startsWith('video/');
+                        
+                        if (isVideo) {
+                            card.classList.add('video-card');
+                            card.innerHTML = `
+                                <img src="${imgUrl}" loading="lazy">
+                                <video preload="none" muted loop playsinline>
+                                    <source src="https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${API_KEY}" type="${file.mimeType}">
+                                </video>
+                                <div class="video-play-button">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <div class="video-overlay">
+                                    <i class="fas fa-video"></i>
+                                    فيديو
+                                </div>
+                            `;
+                            
+                            // Add hover event listeners for video
+                            let video = null;
+                            let videoTimeout = null;
+                            
+                            card.addEventListener('mouseenter', () => {
+                                videoTimeout = setTimeout(() => {
+                                    video = card.querySelector('video');
+                                    if (video) {
+                                        video.load();
+                                        video.play().catch(e => console.log('Video autoplay failed:', e));
+                                    }
+                                }, 300);
+                            });
+                            
+                            card.addEventListener('mouseleave', () => {
+                                if (videoTimeout) clearTimeout(videoTimeout);
+                                if (video) {
+                                    video.pause();
+                                    video.currentTime = 0;
+                                }
+                            });
+                            
+                            card.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                window.open(`https://drive.google.com/file/d/${file.id}/view`, '_blank');
+                            });
+                        } else {
+                            card.innerHTML = `<img src="${imgUrl}" loading="lazy">`;
+                            card.onclick = () => window.open(`https://drive.google.com/file/d/${file.id}/view`, '_blank');
+                        }
+                        
+                        gallery.appendChild(card);
+                        // Staggered animation
+                        setTimeout(() => card.classList.add('revealed'), 100 + index * 50);
+                    });
+                    imageToken = data.nextPageToken || null;
+                }
+                if (!imageToken) document.getElementById('sentinel').innerText = "تم تحميل جميع الذكريات";
+            } catch (err) { console.error(err); }
+            finally { loading = false; }
+        }
+
+        // 5. AUDIO PLAYER FUNCTIONS
+        async function fetchAudioFiles() {
+            if (audioLoading) return;
+            audioLoading = true;
+            const q = encodeURIComponent(`'${AUDIO_FOLDER_ID}' in parents and mimeType contains 'audio/' and trashed = false`);
+            const url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)&key=${API_KEY}`;
+
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.files && data.files.length > 0) {
+                    audioFiles = data.files;
+                    renderPlaylist();
+                    loadTrack(0, false);
+                } else {
+                    // Arabic-themed demo tracks
+                    audioFiles = [
+                        { id: 'demo1', name: 'أيام الجامعة' },
+                        { id: 'demo2', name: 'ليالي الدراسة' },
+                        { id: 'demo3', name: 'أصدقاء للأبد' },
+                        { id: 'demo4', name: 'يوم التخرج' }
+                    ];
+                    renderPlaylist();
+                    loadTrack(0, false);
+                }
+            } catch (err) { 
+                console.error(err);
+                audioFiles = [
+                    { id: 'demo1', name: 'أيام الجامعة' },
+                    { id: 'demo2', name: 'ليالي الدراسة' },
+                    { id: 'demo3', name: 'أصدقاء للأبد' }
+                ];
+                renderPlaylist();
+                loadTrack(0, false);
+            } finally {
+                audioLoading = false;
+            }
+        }
+
+        function renderPlaylist() {
+            const playlist = document.getElementById('playlist');
+            playlist.innerHTML = '';
+            
+            audioFiles.forEach((track, index) => {
+                const item = document.createElement('div');
+                item.className = `playlist-item ${index === currentAudioIndex ? 'active' : ''}`;
+                item.innerHTML = `
+                    <div class="playlist-index">${String(index + 1).padStart(2, '0')}</div>
+                    <div style="flex:1; overflow:hidden;">
+                        <div class="arabic-text" style="font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.name.split('.')[0]}</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7; color: var(--secondary-orange);">ذاكرة الجامعة</div>
+                    </div>
+                `;
+                item.onclick = () => {
+                    loadTrack(index, true);
+                };
+                playlist.appendChild(item);
+            });
+        }
+
+        function loadTrack(index, play) {
+            currentAudioIndex = index;
+            const track = audioFiles[index];
+            
+            // Update UI
+            document.getElementById('miniTrackTitle').textContent = track.name.split('.')[0];
+            document.getElementById('miniTrackArtist').textContent = 'ذاكرة الجامعة';
+            document.getElementById('expandedTrackTitle').textContent = track.name.split('.')[0];
+            document.getElementById('expandedTrackArtist').textContent = 'ذاكرة الجامعة';
+            
+            // Update playlist highlight
+            document.querySelectorAll('.playlist-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+            
+            if (track.id.startsWith('demo')) {
+                // Demo mode - no actual audio
+                if (play) {
+                    simulatePlayback();
+                }
+            } else {
+                audioPlayer.src = `https://www.googleapis.com/drive/v3/files/${track.id}?alt=media&key=${API_KEY}`;
+                if (play) {
+                    audioPlayer.play();
+                    updatePlayState(true);
+                }
+            }
+        }
+
+        function togglePlay() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                updatePlayState(true);
+            } else {
+                audioPlayer.pause();
+                updatePlayState(false);
+            }
+        }
+
+        function updatePlayState(playing) {
+            isPlaying = playing;
+            const playIcon = document.getElementById('playIcon');
+            const pauseIcon = document.getElementById('pauseIcon');
+            const expandedPlayIcon = document.getElementById('expandedPlayIcon');
+            const expandedPauseIcon = document.getElementById('expandedPauseIcon');
+            
+            if (playing) {
+                playIcon.style.display = 'none';
+                pauseIcon.style.display = 'block';
+                expandedPlayIcon.style.display = 'none';
+                expandedPauseIcon.style.display = 'block';
+                document.querySelector('.player-album-art').style.animationPlayState = 'running';
+                document.querySelector('.expanded-album-art').style.animationPlayState = 'running';
+            } else {
+                playIcon.style.display = 'block';
+                pauseIcon.style.display = 'none';
+                expandedPlayIcon.style.display = 'block';
+                expandedPauseIcon.style.display = 'none';
+                document.querySelector('.player-album-art').style.animationPlayState = 'paused';
+                document.querySelector('.expanded-album-art').style.animationPlayState = 'paused';
+            }
+        }
+
+        function nextTrack() {
+            currentAudioIndex = (currentAudioIndex + 1) % audioFiles.length;
+            loadTrack(currentAudioIndex, true);
+        }
+
+        function prevTrack() {
+            currentAudioIndex = (currentAudioIndex - 1 + audioFiles.length) % audioFiles.length;
+            loadTrack(currentAudioIndex, true);
+        }
+
+        function toggleExpandedPlayer() {
+            const expandedPlayer = document.getElementById('expandedPlayer');
+            expandedPlayer.classList.toggle('active');
+        }
+
+        // RTL Volume adjustment
+        function adjustVolume(e) {
+            const slider = document.getElementById('volumeSlider');
+            const rect = slider.getBoundingClientRect();
+            // For RTL: calculate from right side
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            // Calculate percentage from right side
+            const percentage = Math.max(0, Math.min(1, (width - x) / width));
+            
+            audioPlayer.volume = percentage;
+            document.getElementById('volumeLevel').style.width = `${percentage * 100}%`;
+        }
+
+        // RTL Progress bar click for expanded player
+        function handleExpandedProgressClick(e) {
+            if (!audioPlayer.duration) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            // Calculate percentage from right side for RTL
+            const percentage = Math.max(0, Math.min(1, (width - x) / width));
+            audioPlayer.currentTime = percentage * audioPlayer.duration;
+        }
+
+        // RTL Progress bar click for compact player
+        function handleCompactProgressClick(e) {
+            if (!audioPlayer.duration) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            // Calculate percentage from right side for RTL
+            const percentage = Math.max(0, Math.min(1, (width - x) / width));
+            audioPlayer.currentTime = percentage * audioPlayer.duration;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function simulatePlayback() {
+            if (!isPlaying) return;
+            
+            // Simulate progress
+            const progress = (Date.now() % 180000) / 180000; // 3 minute simulation
+            document.getElementById('miniProgress').style.width = `${progress * 100}%`;
+            document.getElementById('expandedProgressFill').style.width = `${progress * 100}%`;
+            document.getElementById('currentTime').textContent = formatTime(progress * 180);
+            
+            requestAnimationFrame(simulatePlayback);
+        }
+
+        // Audio player events
+        audioPlayer.ontimeupdate = () => {
+            const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            document.getElementById('miniProgress').style.width = `${progress}%`;
+            document.getElementById('expandedProgressFill').style.width = `${progress}%`;
+            document.getElementById('currentTime').textContent = formatTime(audioPlayer.currentTime);
+            if (audioPlayer.duration) {
+                document.getElementById('totalTime').textContent = formatTime(audioPlayer.duration);
+            }
+        };
+
+        audioPlayer.onended = () => {
+            nextTrack();
+        };
+
+        // 6. EVENT LISTENERS
+        const slider = document.getElementById('sizeSlider');
+        slider.addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--cols', e.target.value);
+        });
+
+        const topBtn = document.getElementById('topBtn');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) topBtn.classList.add('visible');
+            else topBtn.classList.remove('visible');
+        });
+
+        const obs = new IntersectionObserver(e => {
+            if (e[0].isIntersecting && document.getElementById('gallery').classList.contains('active')) {
+                fetchImages();
+            }
+        }, { rootMargin: '300px' });
+        
+        obs.observe(document.getElementById('sentinel'));
+
+        // Initialize volume
+        audioPlayer.volume = 0.8;
+        document.getElementById('volumeLevel').style.width = '80%';
+
+        // Load audio files on page load
+        fetchAudioFiles();
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            } else if (e.code === 'ArrowRight') {
+                nextTrack();
+            } else if (e.code === 'ArrowLeft') {
+                prevTrack();
+            } else if (e.code === 'KeyM') {
+                toggleExpandedPlayer();
+            }
+        });
+        
+        // Fix for credit link - ensure it's always clickable
+        document.querySelector('.credit-footer').addEventListener('click', function(e) {
+            if (e.target.classList.contains('credit-link') || e.target.closest('.credit-link')) {
+                // Link will navigate naturally
+                return;
+            }
+        });
+    </script>
+</body>
+</html>
